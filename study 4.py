@@ -33,13 +33,15 @@ if 'first_intervene' not in st.session_state:
     st.session_state.first_intervene = None
 if 'total_intervene' not in st.session_state:
     st.session_state.total_intervene = 0
+if 'nudge_prompt' not in st.session_state:
+    st.session_state.nudge_prompt = ""
 
 # --- 2. 页面标题 ---
 st.title("🤖 Seed AI")
 
 # --- 3. 侧边栏 ---
 st.sidebar.info(f"**用户ID:** {st.session_state.user_id}")
-st.sidebar.info(f"**助推组别:** {st.session_state.nudge_group}")
+st.sidebar.info(f"**助推组别:** {st.session_state.group}")  # 👈 修复这里
 
 # --- 4. 简历图片（和研究3完全一样：横向4列） ---
 st.subheader("📄 简历材料")
@@ -104,26 +106,20 @@ revision_keywords = [
 # ==============================================
 def render_nudge(last_ai_response):
     if st.session_state.group == 'A':
-        # 1. 原有的字数精简提示
         if len(last_ai_response) > 150:
             st.toast("⚠️ 检测到筛选标准较长，需要为你切换为精简模式吗？", icon="📏")
             if st.button("点此一键精简为100-120字/条"):
                 return "请将上述筛选标准每条精简到100-120字，保留核心招聘要求，语言通俗"
-        
-        # 2. 新增：结构化整理提示
         elif len(last_ai_response) > 2 and not "、" in last_ai_response[:50]:
             st.toast("⚠️ 检测到内容结构较零散，需要为你梳理成清晰条目吗？", icon="📋")
             if st.button("点此一键整理为结构化条目"):
                 return "请将上述筛选标准整理为分点条目，每条开头标注清晰的维度（如专业能力、项目经验）"
-        
-        # 3. 新增：专业术语优化提示
         elif "会" in last_ai_response[:30] or "可以" in last_ai_response[:30]:
             st.toast("⚠️ 检测到内容偏口语化，需要切换为HR专业表述吗？", icon="💼")
             if st.button("点此一键切换为专业招聘术语"):
                 return "请将上述筛选标准替换为HR专业招聘术语，避免口语化表达"
 
     elif st.session_state.group == 'B':
-        # 原有B组的功能按钮不变
         st.info("提示：可点击下方按钮快速调整AI生成的筛选标准")
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -138,8 +134,6 @@ def render_nudge(last_ai_response):
             if st.button("🧠", help="优化逻辑清晰度"):
                 st.session_state.nudge_prompt = "请按「算法能力→项目经验→专业背景」排序优化筛选标准，条理更清晰"
                 st.toast("已触发逻辑优化！", icon="✅")
-    
-    # Control组无任何提示，直接返回None
     return None
     
 # --- 聊天界面（和研究3完全一样） ---
@@ -167,7 +161,7 @@ if prompt := st.chat_input("输入指令（可修改/干预意图）..."):
     st.session_state.messages.append({"role": "assistant", "content": ai_content})
 
     # 显示助推（嵌入研究3格式）
-    #render_nudge(ai_content)
+    render_nudge(ai_content)  # 👈 取消注释，正常调用
 
 # --- 导出数据（和研究3完全一样的CSV格式） ---
 st.divider()
@@ -183,7 +177,7 @@ if st.button("✅ 完成并导出实验数据"):
 
     final_data = {
         "user_id": [st.session_state.user_id],
-        "nudge_group": [st.session_state.nudge_group],
+        "group": [st.session_state.group],  # 👈 修复这里
         "total_turns": [total_turns],
         "first_intervene_turn": [first_intervene_turn],
         "total_intervene_count": [total_intervene_count],
