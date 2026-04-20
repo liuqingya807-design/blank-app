@@ -31,7 +31,7 @@ if "consent" not in st.session_state:
     """)
     if st.button("我已阅读并同意，进入实验"):
         st.session_state["consent"] = True
-        st.experimental_rerun()
+        st.rerun()
     st.stop()
 
 # --- 【安全】DeepSeek 配置，已锁死 chat 模型 ---
