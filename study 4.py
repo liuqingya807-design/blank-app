@@ -70,11 +70,11 @@ st.markdown("""
 - 熟悉 Python/C++ 等编程语言，熟练使用 PyTorch 或 TensorFlow 框架；
 - 核心关注：具备良好的算法优化能力，有实际的项目应用经验者优先。
 """)
-    choice = st.radio("✅ 请选择录取的候选人：", ["候选人1", "候选人2", "候选人3", "候选人4"])
-    q1 = st.text_input("① 专业匹配度评价（≤200字）：")
-    q2 = st.text_input("② 算法优化能力评价（≤200字）：")
-    q3 = st.text_input("③ 项目经验评价（≤200字）：")
-    user_task_input = f"录取：{choice} | 专业：{q1} | 算法能力：{q2} | 项目经验：{q3}"
+choice = st.radio("✅ 请选择录取的候选人：", ["候选人1", "候选人2", "候选人3", "候选人4"])
+q1 = st.text_input("① 专业匹配度评价（≤200字）：")
+q2 = st.text_input("② 算法优化能力评价（≤200字）：")
+q3 = st.text_input("③ 项目经验评价（≤200字）：")
+user_task_input = f"录取：{choice} | 专业：{q1} | 算法能力：{q2} | 项目经验：{q3}"
 
 st.divider()
 
