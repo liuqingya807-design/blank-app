@@ -25,8 +25,8 @@ if 'messages' not in st.session_state:
     st.session_state.messages = []
 if 'log_data' not in st.session_state:
     st.session_state.log_data = []
-if 'nudge_group' not in st.session_state:
-    st.session_state.nudge_group = random.choice(['Control', 'A', 'B'])
+if 'group' not in st.session_state:
+    st.session_state.group = random.choice(['Control', 'A', 'B'])
 if 'user_id' not in st.session_state:
     st.session_state.user_id = f"user_{random.randint(100000, 999999)}"
 if 'first_intervene' not in st.session_state:
@@ -167,7 +167,7 @@ if prompt := st.chat_input("输入指令（可修改/干预意图）..."):
     st.session_state.messages.append({"role": "assistant", "content": ai_content})
 
     # 显示助推（嵌入研究3格式）
-    render_nudge(ai_content)
+    #render_nudge(ai_content)
 
 # --- 导出数据（和研究3完全一样的CSV格式） ---
 st.divider()
