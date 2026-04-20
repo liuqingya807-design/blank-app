@@ -33,35 +33,19 @@ if "consent" not in st.session_state:
         st.session_state["consent"] = True
         st.rerun()
     st.stop()
-
-st.title("Seed AI")
-
-# ✅ 你要的句子 👉 我已经精准放在这里了！
-st.markdown("### 请您浏览以下四份简历，并按照提示完成接下来的任务。")
-
-# 4份简历展示
-col1, col2, col3, col4 = st.columns(4)
-RESUME_IMAGES = [
-    "https://i.imgur.com/hfRjQTI.jpeg",
-    "https://i.imgur.com/dDM6Mt2.jpeg",
-    "https://i.imgur.com/O5cvFL9.jpeg",
-    "https://i.imgur.com/cyRqMzM.jpeg"
-]
-
-with col1:
-    st.image(RESUME_IMAGES[0], use_column_width=True)
-with col2:
-    st.image(RESUME_IMAGES[1], use_column_width=True)
-with col3:
-    st.image(RESUME_IMAGES[2], use_column_width=True)
-with col4:
-    st.image(RESUME_IMAGES[3], use_column_width=True)
     
 # --- 【安全】DeepSeek 配置，已锁死 chat 模型 ---
 client = OpenAI(
     api_key="sk-f9fd213424cf41d29cf7c564be6ac48d",  # 后面教你在这里填你的 DeepSeek Key
     base_url="https://api.deepseek.com"
 )
+
+RESUME_IMAGES = [
+    "https://i.imgur.com/hfRjQTI.jpeg",
+    "https://i.imgur.com/dDM6Mt2.jpeg",
+    "https://i.imgur.com/O5cvFL9.jpeg",
+    "https://i.imgur.com/cyRqMzM.jpeg"
+]
 
 if 'messages' not in st.session_state:
     st.session_state.messages = []
