@@ -6,6 +6,36 @@ from openai import OpenAI
 # --- 1. 实验初始化配置 ---
 st.set_page_config(page_title="Seed AI", layout="centered")
 
+if "consent" not in st.session_state:
+    st.markdown("""
+    # 欢迎参与本次实验！
+尊敬的女士/先生：
+您好！非常感谢您参与本实验，本实验旨在探究任务复杂度是否会调节元认知能力对用户默认选项改变行为的影响，仅用于毕业论文研究。
+
+本次实验包含以下内容：
+- 您将被随机分配到「求职者」或「HR」两种角色，完成对应的招聘相关任务；
+- 任务过程中，您可以与AI助手对话，系统会自动记录您的对话数据（仅用于学术研究，全程匿名、严格保密）；
+- 所有任务完成后，您将填写一份简短的后测问卷，整体耗时约10-15分钟；
+
+实验流程：
+1.  阅读任务说明 → 分配用户ID
+2.  完成角色对应的核心任务（与AI对话协作）
+3.  填写后测问卷（含用户ID填写项，用于数据匹配）
+
+⚠️ 重要说明：
+- 本实验无对错之分，请按您的真实想法完成任务
+- 您可以随时退出实验，无需任何理由，数据不会被记录
+- 所有数据仅用于学术研究，不会泄露任何个人信息
+
+点击下方按钮，即表示您已阅读并同意以上说明，自愿参与本次实验。
+""")
+     if st.button("我已阅读并同意，进入实验"):
+        st.session_state["consent"] = True
+        st.experimental_rerun()
+
+    # 未同意时，不再执行后续代码
+    st.stop()
+
 # --- 【安全】DeepSeek 配置，已锁死 chat 模型 ---
 client = OpenAI(
     api_key="sk-f9fd213424cf41d29cf7c564be6ac48d",  # 后面教你在这里填你的 DeepSeek Key
@@ -148,7 +178,7 @@ if prompt := st.chat_input("输入指令（可修改/干预意图）..."):
 
 # --- 导出数据（含完整对话）---
 st.divider()
-if st.button("✅ 导出实验数据"):
+if st.button("✅ 完成并导出实验数据"):
     first_intervene_turn = st.session_state.first_intervene if st.session_state.first_intervene else 0
     total_intervene_count = st.session_state.total_intervene
     total_turns = len([m for m in st.session_state.messages if m["role"] == "user"])
