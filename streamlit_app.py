@@ -48,6 +48,22 @@ RESUME_IMAGES = [
     "https://i.imgur.com/cyRqMzM.jpeg"
 ]
 
+st.title("Seed AI")
+st.header("简历材料")
+st.markdown("请您浏览以下四份简历，并按照提示完成接下来的任务。")
+
+# ✅ 和截图一样的横向四列布局
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    st.image(RESUME_IMAGES[0], use_column_width=True, caption="简历1")
+with col2:
+    st.image(RESUME_IMAGES[1], use_column_width=True, caption="简历2")
+with col3:
+    st.image(RESUME_IMAGES[2], use_column_width=True, caption="简历3")
+with col4:
+    st.image(RESUME_IMAGES[3], use_column_width=True, caption="简历4")
+    
 # 初始化实验数据
 if 'messages' not in st.session_state:
     st.session_state.messages = []
