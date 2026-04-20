@@ -41,7 +41,7 @@ st.title("🤖 Seed AI")
 
 # --- 3. 侧边栏 ---
 st.sidebar.info(f"**用户ID:** {st.session_state.user_id}")
-st.sidebar.info(f"**助推组别:** {st.session_state.group}")  # 👈 修复这里
+st.sidebar.info(f"**助推组别:** {st.session_state.group}")
 
 # --- 4. 简历图片（和研究3完全一样：横向4列） ---
 st.subheader("📄 简历材料")
