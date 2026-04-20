@@ -28,12 +28,10 @@ if "consent" not in st.session_state:
 - 所有数据仅用于学术研究，不会泄露任何个人信息
 
 点击下方按钮，即表示您已阅读并同意以上说明，自愿参与本次实验。
-""")
-     if st.button("我已阅读并同意，进入实验"):
+    """)
+    if st.button("我已阅读并同意，进入实验"):
         st.session_state["consent"] = True
         st.experimental_rerun()
-
-    # 未同意时，不再执行后续代码
     st.stop()
 
 # --- 【安全】DeepSeek 配置，已锁死 chat 模型 ---
