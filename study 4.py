@@ -159,7 +159,10 @@ def render_nudge(last_ai_response):
                 st.rerun()
                 
     return None
-    
+
+ai_content = st.session_state.messages[-1]["content"] if len(st.session_state.messages) > 0 else ""
+render_nudge(ai_content)
+
 # --- 聊天界面 ---
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
@@ -183,9 +186,6 @@ if prompt := st.chat_input("输入指令（可修改/干预意图）..."):
             ai_content = fetch_ai_response(st.session_state.messages)
             st.markdown(ai_content)
     st.session_state.messages.append({"role": "assistant", "content": ai_content})
-
-    # ✅ 必须调用，提示才会出来
-    render_nudge(ai_content)
 
 # --- 导出数据 ---
 st.divider()
