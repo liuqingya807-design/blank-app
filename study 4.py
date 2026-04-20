@@ -161,7 +161,65 @@ if prompt := st.chat_input("输入指令（可修改/干预意图）..."):
     st.session_state.messages.append({"role": "assistant", "content": ai_content})
 
     # 显示助推（嵌入研究3格式）
-    render_nudge(ai_content)  # 👈 取消注释，正常调用
+def render_nudge(last_ai_response):
+    if st.session_state.group == 'A':
+        # 1. 字数太长 → 提示精简
+        if len(last_ai_response) > 150:
+            st.toast("⚠️ 检测到筛选标准较长，建议精简为100-120字/条", icon="📏")
+            if st.button("✅ 点此一键精简为100-120字"):
+                # 👇 这里真正把指令发给AI
+                st.session_state.messages.append({"role": "user", "content": "请把每条筛选标准精简到100-120字，保留核心内容"})
+                with st.spinner("正在精简..."):
+                    new_ai = fetch_ai_response(st.session_state.messages)
+                st.session_state.messages.append({"role": "assistant", "content": new_ai})
+                st.rerun()
+
+        # 2. 结构零散 → 提示分点
+        elif len(last_ai_response) > 2 and not "、" in last_ai_response[:50]:
+            st.toast("⚠️ 内容结构零散，建议整理成分点清晰格式", icon="📋")
+            if st.button("✅ 点此整理为分点条目"):
+                st.session_state.messages.append({"role": "user", "content": "请把内容整理成清晰分点条目"})
+                with st.spinner("正在整理..."):
+                    new_ai = fetch_ai_response(st.session_state.messages)
+                st.session_state.messages.append({"role": "assistant", "content": new_ai})
+                st.rerun()
+
+        # 3. 口语化 → 提示专业
+        elif "会" in last_ai_response[:30] or "可以" in last_ai_response[:30]:
+            st.toast("⚠️ 表述偏口语，建议使用HR专业表述", icon="💼")
+            if st.button("✅ 点此切换为专业HR用语"):
+                st.session_state.messages.append({"role": "user", "content": "请使用专业HR招聘用语，不要口语化"})
+                with st.spinner("正在优化..."):
+                    new_ai = fetch_ai_response(st.session_state.messages)
+                st.session_state.messages.append({"role": "assistant", "content": new_ai})
+                st.rerun()
+
+    elif st.session_state.group == 'B':
+        st.info("💡 快捷优化按钮：")
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            if c1.button("💼 专业语气"):
+                st.session_state.messages.append({"role": "user", "content": "请使用专业HR语气"})
+                with st.spinner("正在生成..."):
+                    new_ai = fetch_ai_response(st.session_state.messages)
+                st.session_state.messages.append({"role": "assistant", "content": new_ai})
+                st.rerun()
+        with c2:
+            if c2.button("📏 控制字数"):
+                st.session_state.messages.append({"role": "user", "content": "请控制每条100-120字"})
+                with st.spinner("正在生成..."):
+                    new_ai = fetch_ai_response(st.session_state.messages)
+                st.session_state.messages.append({"role": "assistant", "content": new_ai})
+                st.rerun()
+        with c3:
+            if c3.button("🧠 优化逻辑"):
+                st.session_state.messages.append({"role": "user", "content": "请按能力→经验→背景排序，条理更清晰"})
+                with st.spinner("正在生成..."):
+                    new_ai = fetch_ai_response(st.session_state.messages)
+                st.session_state.messages.append({"role": "assistant", "content": new_ai})
+                st.rerun()
+                
+    return None
 
 # --- 导出数据（和研究3完全一样的CSV格式） ---
 st.divider()
