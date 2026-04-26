@@ -6,6 +6,36 @@ from openai import OpenAI
 # --- 1. 实验初始化配置 ---
 st.set_page_config(page_title="Seed AI", layout="centered")
 
+if "consent" not in st.session_state:
+st.markdown("""
+    # 欢迎参与本次实验！
+尊敬的女士/先生：
+您好！非常感谢您参与本实验，本实验旨在了解用户在求职面试相关任务中与AI助手的交互行为，仅用于毕业论文研究。
+
+本次实验包含以下内容：
+- 您将进入一个求职面试相关任务情境，并根据页面说明完成相应任务；
+- 任务过程中，您可以与AI助手对话，系统会自动记录您的对话数据（仅用于学术研究，全程匿名、严格保密）；
+- 任务完成后，请根据页面提示保存数据，并填写一份简短的后续问卷；
+
+实验流程：
+1.  阅读任务说明进入任务界面 → 分配用户ID
+2.  根据页面说明完成相应任务（与AI对话协作）
+3.  完成任务后，点击页面中的“保存数据”按钮
+4.  填写后测问卷
+
+⚠️ 重要说明：
+- 本实验无对错之分，请按您的真实想法完成任务
+- 您可以随时退出实验，无需任何理由，数据不会被记录
+- 所有数据仅用于学术研究，不会泄露任何个人信息
+
+点击下方按钮，即表示您已阅读并同意以上说明，自愿参与本次实验。
+    """)
+    if st.button("我已阅读并同意，进入实验"):
+        st.session_state["consent"] = True
+        st.rerun()
+    st.stop()
+    
+
 # 直接配置 DeepSeek 接口
 client = OpenAI(
     api_key="sk-f9fd213424cf41d29cf7c564be6ac48d",  # 你自己填写 API Key
@@ -189,31 +219,36 @@ if prompt := st.chat_input("输入指令（可修改/干预意图）..."):
 
 # --- 导出数据 ---
 st.divider()
-if st.button("✅ 完成并导出实验数据"):
-    first_intervene_turn = st.session_state.first_intervene if st.session_state.first_intervene else 0
-    total_intervene_count = st.session_state.total_intervene
-    total_turns = len([m for m in st.session_state.messages if m["role"] == "user"])
+user_turns = len([m for m in st.session_state.messages if m["role"]=="user"])
 
-    full_dialogue = ""
-    for msg in st.session_state.messages:
+if user_turns < 3:
+    st.warning(f"当前对话轮次：{user_turns}，**至少完成3轮对话**才能提交实验")
+else:
+    if st.button("✅ 完成并导出实验数据"):
+        first_intervene_turn = st.session_state.first_intervene if st.session_state.first_intervene else 0
+        total_intervene_count = st.session_state.total_intervene
+        total_turns = len([m for m in st.session_state.messages if m["role"] == "user"])
+        
+        full_dialogue = ""
+        for msg in st.session_state.messages:
         role = "用户" if msg["role"] == "user" else "AI"
         full_dialogue += f"[{role}]: {msg['content']}\n\n"
-
-    final_data = {
-        "user_id": [st.session_state.user_id],
-        "group": [st.session_state.group],
-        "total_turns": [total_turns],
-        "first_intervene_turn": [first_intervene_turn],
-        "total_intervene_count": [total_intervene_count],
-        "full_dialogue": [full_dialogue]
-    }
-
-    final_df = pd.DataFrame(final_data)
-    csv = final_df.to_csv(index=False, encoding="utf-8-sig")
-
-    st.download_button(
-        "📥 点击下载 CSV 文件",
-        csv,
-        f"SeedAI_Group_{st.session_state.user_id}.csv",
-        "text/csv"
-    )
+        
+        final_data = {
+            "user_id": [st.session_state.user_id],
+            "group": [st.session_state.group],
+            "total_turns": [total_turns],
+            "first_intervene_turn": [first_intervene_turn],
+            "total_intervene_count": [total_intervene_count],
+            "full_dialogue": [full_dialogue]
+        }
+        
+        final_df = pd.DataFrame(final_data)
+        csv = final_df.to_csv(index=False, encoding="utf-8-sig")
+        
+        st.download_button(
+            "📥 点击下载 CSV 文件",
+            csv,
+            f"SeedAI_Group_{st.session_state.user_id}.csv",
+            "text/csv"
+        )
