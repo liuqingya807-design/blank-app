@@ -10,17 +10,18 @@ if "consent" not in st.session_state:
     st.markdown("""
     # 欢迎参与本次实验！
 尊敬的女士/先生：
-您好！非常感谢您参与本实验，本实验旨在探究任务复杂度是否会调节元认知能力对用户默认选项改变行为的影响，仅用于毕业论文研究。
+您好！非常感谢您参与本实验，本实验旨在了解用户在求职面试相关任务中与AI助手的交互行为，仅用于毕业论文研究。
 
 本次实验包含以下内容：
-- 您将被随机分配到「求职者」或「HR」两种角色，完成对应的招聘相关任务；
+- 您将被随机分配到「求职者」或「HR」两种角色，并根据页面说明完成相应任务；
 - 任务过程中，您可以与AI助手对话，系统会自动记录您的对话数据（仅用于学术研究，全程匿名、严格保密）；
-- 所有任务完成后，您将填写一份简短的后测问卷，整体耗时约10-15分钟；
+- 任务完成后，请根据页面提示保存数据，并填写一份简短的后续问卷；
 
 实验流程：
-1.  阅读任务说明 → 分配用户ID
+1.  阅读任务说明进入任务界面 → 分配用户ID
 2.  完成角色对应的核心任务（与AI对话协作）
-3.  填写后测问卷（含用户ID填写项，用于数据匹配）
+3.  完成任务后，点击页面中的“保存数据”按钮
+4.  填写后测问卷
 
 ⚠️ 重要说明：
 - 本实验无对错之分，请按您的真实想法完成任务
@@ -80,7 +81,7 @@ task_type = st.session_state.task_type
 user_task_input = ""
 
 if task_type == "low":
-    st.markdown("### 低负荷任务：求职者")
+    st.markdown("求职者写自我介绍")
     st.markdown("""
 **你是一名求职者，拟应聘一家公司的“AI算法工程师”岗位。**
 请结合岗位关注提示、面试者简历，以求职者身份编写1份自我介绍，为将来的面试做准备。
@@ -102,7 +103,7 @@ if task_type == "low":
 """)
     user_task_input = st.text_area("✍️ 请在此编写你的自我介绍：", height=200)
 else:
-    st.markdown("### 高负荷任务：人力资源经理（HR）")
+    st.markdown("### HR筛选简历")
     st.markdown("""
 **你是一名人力资源经理（HR），你所在的公司拟招聘1名AI算法工程师。**
 请梳理你目前收到的4份简历，结合岗位招聘标准，为“AI算法工程师”岗位选择1名合适的候选人。
@@ -174,33 +175,38 @@ if prompt := st.chat_input("输入指令（可修改/干预意图）..."):
 
 # --- 导出数据（含完整对话）---
 st.divider()
-if st.button("✅ 完成并导出实验数据"):
-    first_intervene_turn = st.session_state.first_intervene if st.session_state.first_intervene else 0
-    total_intervene_count = st.session_state.total_intervene
-    total_turns = len([m for m in st.session_state.messages if m["role"] == "user"])
+user_turns = len([m for m in st.session_state.messages if m["role"]=="user"])
 
-    full_dialogue = ""
-    for msg in st.session_state.messages:
-        role = "用户" if msg["role"] == "user" else "AI"
-        full_dialogue += f"[{role}]: {msg['content']}\n\n"
-
-    final_data = {
-        "user_id": [st.session_state.user_id],
-        "group": [st.session_state.task_type],
-        "total_turns": [total_turns],
-        "first_intervene_turn": [first_intervene_turn],
-        "total_intervene_count": [total_intervene_count],
-        "user_answer": [user_task_input],
-        "deepseek_response": [st.session_state.messages[-1]["content"] if len(st.session_state.messages) > 0 else ""],
-        "full_dialogue": [full_dialogue]
-    }
-
-    final_df = pd.DataFrame(final_data)
-    csv = final_df.to_csv(index=False, encoding="utf-8-sig")
-    
-    st.download_button(
-        "📥 点击下载 CSV 文件",
-        csv,
-        f"SeedAI_{st.session_state.user_id}.csv",
-        "text/csv"
-    )
+if user_turns < 3:
+    st.warning(f"当前对话轮次：{user_turns}，**至少完成3轮对话**才能提交实验")
+else:
+    if st.button("✅ 完成并导出实验数据"):
+        first_intervene_turn = st.session_state.first_intervene if st.session_state.first_intervene else 0
+        total_intervene_count = st.session_state.total_intervene
+        total_turns = len([m for m in st.session_state.messages if m["role"] == "user"])
+        
+        full_dialogue = ""
+        for msg in st.session_state.messages:
+            role = "用户" if msg["role"] == "user" else "AI"
+            full_dialogue += f"[{role}]: {msg['content']}\n\n"
+            
+        final_data = {
+            "user_id": [st.session_state.user_id],
+            "group": [st.session_state.task_type],
+            "total_turns": [total_turns],
+            "first_intervene_turn": [first_intervene_turn],
+            "total_intervene_count": [total_intervene_count],
+            "user_answer": [user_task_input],
+            "deepseek_response": [st.session_state.messages[-1]["content"] if len(st.session_state.messages) > 0 else ""],
+            "full_dialogue": [full_dialogue]
+        }
+        
+        final_df = pd.DataFrame(final_data)
+        csv = final_df.to_csv(index=False, encoding="utf-8-sig")
+        
+        st.download_button(
+            "📥 点击下载 CSV 文件",
+            csv,
+            f"SeedAI_{st.session_state.user_id}.csv",
+            "text/csv"
+        )
