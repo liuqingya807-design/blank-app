@@ -231,8 +231,8 @@ else:
         
         full_dialogue = ""
         for msg in st.session_state.messages:
-        role = "用户" if msg["role"] == "user" else "AI"
-        full_dialogue += f"[{role}]: {msg['content']}\n\n"
+            role = "用户" if msg["role"] == "user" else "AI"
+            full_dialogue += f"[{role}]: {msg['content']}\n\n"
         
         final_data = {
             "user_id": [st.session_state.user_id],
