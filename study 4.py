@@ -7,7 +7,7 @@ from openai import OpenAI
 st.set_page_config(page_title="Seed AI", layout="centered")
 
 if "consent" not in st.session_state:
-st.markdown("""
+    st.markdown("""
     # 欢迎参与本次实验！
 尊敬的女士/先生：
 您好！非常感谢您参与本实验，本实验旨在了解用户在求职面试相关任务中与AI助手的交互行为，仅用于毕业论文研究。
